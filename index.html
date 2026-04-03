@@ -158,7 +158,267 @@ btn3.addEventListener('click',()=>{userNote=noteArea.value.trim();generateReview
 function generateReview(){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.getElementById('loadingState').classList.add('active');setTimeout(()=>{variants=buildVariants();activeVariant=0;showResult();},1200);}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){return[...a].sort(()=>Math.random()-.5)}
-function buildVariants(){const tm={taze_balik:{s:'balıklar taptaze',d:'Balıklar son derece taze ve lezzetli'},lezzetli_mezeler:{s:'mezeler harika',d:'Mezelerin her biri özenle hazırlanmış'},deniz_manzarasi:{s:'manzara muhteşem',d:'Manzarası eşliğinde yemek yemek ayrı bir keyif'},ilgili_servis:{s:'servis çok ilgili',d:'Personel son derece ilgili ve güler yüzlü'},atmosfer:{s:'atmosfer çok güzel',d:'Mekanın atmosferi insanın içini açıyor'},raki_keyfi:{s:'rakı eşliğinde süper',d:'Rakı eşliğinde deniz kenarında harika bir akşam geçirdik'},tarihi_mekan:{s:'tarihi dokusu etkileyici',d:"1928'den beri ayakta olan bu mekanın tarihi dokusu çok etkileyici"}};const gt={'1-2':pick(['İkimiz','Eşimle','Arkadaşımla','Sevgilimle']),'3-4':pick(['Üç arkadaş','Dörtlü grubumuzla','Birkaç arkadaşla']),'5-8':pick(['Geniş bir grupla','Altı kişilik ekibimizle','Arkadaş grubumuzla']),'9+':pick(['Kalabalık bir toplulukla','Büyük bir grupla','Geniş ailemizle'])};const st={'bahce':pick(['bahçede oturup','açık havada','bahçe tarafında keyifle']),'salon':pick(['salonda oturup','iç mekanda','salonun sıcak atmosferinde'])};const ctx=gt[groupSize]+' '+st[seatArea];const o5=[ctx+' harika bir akşam geçirdik.',ctx+' unutulmaz bir yemek deneyimi yaşadık.',ctx+' muhteşem vakit geçirdik.'];const o4=[ctx+' güzel bir akşam geçirdik.',ctx+' keyifli bir yemek yedik.'];const o3=[ctx+' fena sayılmaz bir akşam geçirdik.'];const oL=[ctx+' beklentilerimizi karşılayamadık maalesef.'];const c5=['Kesinlikle tekrar geleceğiz.','Herkese gönül rahatlığıyla tavsiye ederim.','Bir dahaki sefere de ilk tercihim burası olacak.'];const c4=['Tekrar gidebiliriz.','Denemeye değer bir mekan.'];const cM=['Bir şans daha verebilirim.'];function opener(){return rating>=5?pick(o5):rating>=4?pick(o4):rating>=3?pick(o3):pick(oL)}function closer(){return rating>=5?pick(c5):rating>=4?pick(c4):rating>=3?pick(cM):''}const res=[];{let p=[opener()];const sd=selectedTags.map(t=>tm[t]?.s).filter(Boolean);if(sd.length>0){const j=sd.length<=2?sd.join(' ve '):sd.slice(0,-1).join(', ')+' ve '+sd[sd.length-1];p.push(rating>=4?j.charAt(0).toUpperCase()+j.slice(1)+'.':'Olumlu yönleri: '+j+'.');}if(userNote)p.push(userNote);const cl=closer();if(cl)p.push(cl);res.push({label:'Kısa',text:p.join(' ')});}{const ob5=['Koço, Moda\'nın deniz kenarındaki en özel mekanlarından biri.','Yıllardır İstanbul\'un en sevdiğim balık restoranlarından biri Koço.'];let p=[rating>=5?pick(ob5):pick(oL)];p.push(opener());shuffle(selectedTags).map(t=>tm[t]?.d).filter(Boolean).forEach(d=>p.push(d+'.'));if(userNote)p.push(userNote);const cl=closer();if(cl)p.push(cl);res.push({label:'Detaylı',text:p.join(' ')});}{let p=[];if(rating>=5)p.push(pick(['Valla ne diyeyim, Koço\'dan çok memnun ayrıldık!','Arkadaşlar, Koço\'ya gidin pişman olmazsınız.','Koço için tek kelime: süper!']));else if(rating>=4)p.push(pick(['Koço\'da fena geçmedi.','Güzeldi, keyif aldık diyebilirim.']));else p.push('Koço\'dan biraz hayal kırıklığıyla ayrıldık açıkçası.');p.push(opener());const sd=selectedTags.map(t=>tm[t]?.s).filter(Boolean);if(sd.length>0){const c=sd.length<=2?sd.join(', '):sd.slice(0,-1).join(', ')+' ve '+sd[sd.length-1];p.push('Özellikle '+c+' diyebilirim.');}if(userNote)p.push(userNote);if(rating>=4)p.push(pick(['Bir daha gelir miyim? Kesinlikle evet!','Tavsiyemdir 👍','Güzel bir deneyimdi, teşekkürler Koço!']));res.push({label:'Samimi',text:p.join(' ')});}return res;}
+function buildVariants(){
+// === TAG MAP: her tag için 5 kısa + 5 detaylı varyant ===
+const tm={
+taze_balik:{
+s:pick(['balıklar taptaze','balık kalitesi üst düzey','balıklar çok taze','taze balıkları enfes','balıklar mükemmeldi']),
+d:pick(['Balıklar son derece taze ve lezzetli.','Günün balığı harika pişirilmişti, tazeliği hemen hissediliyor.','Deniz ürünleri gerçekten çok taze, her lokmada kaliteyi anlıyorsunuz.','Balıkların tazeliği ve pişirilme şekli mükemmeldi.','Taze balık konusunda İstanbul\'un en iyilerinden biri.'])},
+lezzetli_mezeler:{
+s:pick(['mezeler harika','mezeleri çok lezzetli','meze çeşitleri enfes','mezeler birbirinden güzel','meze tabağı muhteşem']),
+d:pick(['Mezelerin her biri özenle hazırlanmış, hepsi çok lezzetliydi.','Meze tepsisi geldiğinde gözlerimiz parladı, her biri birbirinden güzeldi.','Zeytinyağlılar ve sıcak mezeler gerçekten çok başarılı.','Mezeleri yemek başlı başına bir keyifti, hepsini tek tek denemek lazım.','Meze çeşitliliği ve lezzeti beklentimizin çok üstündeydi.'])},
+deniz_manzarasi:{
+s:pick(['manzara muhteşem','manzarası büyüleyici','manzara eşsiz','manzarası görülmeye değer','muhteşem deniz manzarası']),
+d:pick(['Manzarası eşliğinde yemek yemek ayrı bir keyif.','Denize karşı oturup yemek yemek her şeyin tadını ikiye katlıyor.','Adalar ve Marmara manzarası gerçekten nefes kesiyor.','Gün batımında manzarası inanılmaz, fotoğraf çekmeden duramıyorsunuz.','Deniz manzarası İstanbul\'un en güzel köşelerinden birini sunuyor.'])},
+ilgili_servis:{
+s:pick(['servis çok ilgili','personel harika','garsonlar güler yüzlü','hizmet kalitesi çok iyi','servis kusursuzdu']),
+d:pick(['Personel son derece ilgili ve güler yüzlü, kendimizi özel hissettik.','Garsonlar çok dikkatli ve önerileri gerçekten isabetliydi.','Servisten çok memnun kaldık, her ihtiyacımız anında karşılandı.','Personelin samimiyeti ve profesyonelliği mekanın değerini artırıyor.','Hizmet anlayışı gerçekten takdire şayan, her detayı düşünmüşler.'])},
+atmosfer:{
+s:pick(['atmosfer çok güzel','ortam harika','ambiyans mükemmel','mekanın havası süper','atmosferi büyüleyici']),
+d:pick(['Mekanın atmosferi insanın içini açıyor, huzurlu bir ortam.','Hem samimi hem şık bir ambiyans, her detay düşünülmüş.','Atmosferi sayesinde akşam çok çabuk geçti, zaman kavramını unuttuk.','Mekanın genel havası çok sıcak ve davetkar.','Ortamın enerjisi harika, rahat ve keyifli bir akşam geçirdik.'])},
+raki_keyfi:{
+s:pick(['rakı eşliğinde süper','rakı keyfi muhteşem','rakı sofrası harikaydı','rakı-meze uyumu mükemmel','rakı içmek için ideal']),
+d:pick(['Rakı eşliğinde deniz kenarında harika bir akşam geçirdik.','Rakı-balık-meze üçlemesi burada bambaşka bir anlam kazanıyor.','Denize karşı rakı keyfi yapabileceğiniz en güzel yerlerden biri.','Rakı sofrası kurmak isteyenler için Koço biçilmiş kaftan.','Soğuk mezelerin yanında rakı keyfi tarif edilemez güzellikte.'])},
+tarihi_mekan:{
+s:pick(['tarihi dokusu etkileyici','tarihi atmosferi harika','mekanın tarihçesi çok ilginç','köklü bir mekan','tarihi bir İstanbul klasiği']),
+d:pick(["1928'den beri ayakta olan bu mekanın tarihi dokusu çok etkileyici.","Neredeyse yüz yıllık geçmişiyle İstanbul'un en köklü restoranlarından.","Mekanın altındaki tarihi şapeli de mutlaka görün, çok etkileyici.","Tarihi dokusu her köşesinden hissediliyor, adeta zamanda yolculuk.","Koço'nun hikayesi ve tarihi, yemek deneyimini bambaşka bir seviyeye taşıyor."])}
+};
+
+// === GRUP BAĞLAMI: her kategori için 8 varyant ===
+const gt={
+'1-2':pick(['İkimiz','Eşimle','Arkadaşımla','Sevgilimle','Eşimle birlikte','İki kişi','Baş başa','Partnerimle']),
+'3-4':pick(['Üç arkadaş','Dörtlü grubumuzla','Birkaç arkadaşla','Üç kişi olarak','Küçük grubumuzla','Birkaç dostumla','Üç beş kişi','Ekibimizle']),
+'5-8':pick(['Geniş bir grupla','Altı kişilik ekibimizle','Arkadaş grubumuzla','Beş kişilik grubumuzla','Kalabalık arkadaş grubuyla','Yedi kişi olarak','Büyükçe bir grupla','Ailece']),
+'9+':pick(['Kalabalık bir toplulukla','Büyük bir grupla','Geniş ailemizle','On kişilik grubumuzla','Büyük bir aile yemeğinde','Kalabalık bir arkadaş grubuyla','Geniş bir ekiple','Büyük bir kutlama için'])
+};
+
+// === OTURMA BAĞLAMI: her kategori için 6 varyant ===
+const st={
+'bahce':pick(['bahçede oturup','açık havada','bahçe tarafında keyifle','dışarıda deniz kenarında','açık alanda','bahçenin güzel havasında']),
+'salon':pick(['salonda oturup','iç mekanda','salonun sıcak atmosferinde','kapalı alanda','iç mekanın samimi ortamında','salonun ferah atmosferinde'])
+};
+
+const ctx=gt[groupSize]+' '+st[seatArea];
+
+// === 5 YILDIZ AÇILIŞ: 12 varyant ===
+const o5=[
+ctx+' harika bir akşam geçirdik.',
+ctx+' unutulmaz bir yemek deneyimi yaşadık.',
+ctx+' muhteşem vakit geçirdik.',
+ctx+' nefis bir akşam yemeği yedik.',
+ctx+' çok keyifli saatler geçirdik.',
+ctx+' mükemmel bir yemek deneyimi yaşadık.',
+ctx+' enfes bir gece geçirdik.',
+ctx+' harikulade bir akşam yaşadık.',
+ctx+' her anından keyif aldığımız bir akşam geçirdik.',
+ctx+' baştan sona kusursuz bir deneyim yaşadık.',
+ctx+' çok özel bir akşam geçirdik.',
+ctx+' tadı damağımızda kalan bir yemek yedik.'
+];
+
+// === 4 YILDIZ AÇILIŞ: 8 varyant ===
+const o4=[
+ctx+' güzel bir akşam geçirdik.',
+ctx+' keyifli bir yemek yedik.',
+ctx+' gayet memnun kaldığımız bir akşam geçirdik.',
+ctx+' hoş bir yemek deneyimi yaşadık.',
+ctx+' güzel vakit geçirdik.',
+ctx+' oldukça keyifli bir akşam geçirdik.',
+ctx+' tatmin edici bir yemek yedik.',
+ctx+' beklentimizi karşılayan güzel bir akşam geçirdik.'
+];
+
+// === 3 YILDIZ AÇILIŞ: 6 varyant (hafif olumlu) ===
+const o3=[
+ctx+' fena sayılmaz bir akşam geçirdik.',
+ctx+' idare eder bir akşam geçirdik ama potansiyeli var.',
+ctx+' ortalama bir deneyim yaşadık, yine de manzarası güzeldi.',
+ctx+' kötü değildi, bazı şeyler güzeldi.',
+ctx+' fena geçmedi diyebilirim, güzel yanları da vardı.',
+ctx+' karışık duygularla ayrıldık ama olumlu yanları ağır basıyor.'
+];
+
+// === 2 YILDIZ AÇILIŞ: 5 varyant (yine de yapıcı) ===
+const o2=[
+ctx+' beklentimizin biraz altında kaldı ama mekan güzel.',
+ctx+' bazı konularda eksikler vardı ama potansiyeli yüksek.',
+ctx+' tam istediğimiz gibi olmadı ama manzarası kurtarıyordu.',
+ctx+' biraz hayal kırıklığı yaşadık ama umarız düzelir.',
+ctx+' her şey mükemmel olmasa da güzel yanları vardı.'
+];
+
+// === 1 YILDIZ AÇILIŞ: 5 varyant (hala yapıcı ve hafif olumlu) ===
+const o1=[
+ctx+' pek memnun kalamadık ama mekanın potansiyeli çok yüksek.',
+ctx+' bu seferki deneyimimiz pek iyi olmadı ama bir şans daha veririz.',
+ctx+' beklentimizi karşılayamadı ama ortamı güzel bir yer.',
+ctx+' bu ziyaretimizde istediğimizi bulamadık, yine de şansımızı tekrar deneriz.',
+ctx+' tam bize göre olmadı ama başkalarının beğenebileceği bir mekan.'
+];
+
+// === 5 YILDIZ KAPANIŞ: 12 varyant ===
+const c5=[
+'Kesinlikle tekrar geleceğiz.',
+'Herkese gönül rahatlığıyla tavsiye ederim.',
+'Bir dahaki sefere de ilk tercihim burası olacak.',
+'Koço\'yu mutlaka denemenizi öneririm.',
+'Tekrar tekrar gelmek isteyeceğiniz bir yer.',
+'İstanbul\'a her gelişimizde uğrayacağımız bir mekan oldu.',
+'Dostlarınızı da alıp gelin, pişman olmazsınız.',
+'Moda\'ya gelince Koço olmazsa olmaz.',
+'Çok memnun ayrıldık, yakında yine geleceğiz.',
+'Burası gerçekten özel bir yer, mutlaka gidin.',
+'Koço şimdi favori restoranlarımız arasına girdi.',
+'Her mevsim ayrı güzel bir mekan, herkese tavsiyemdir.'
+];
+
+// === 4 YILDIZ KAPANIŞ: 8 varyant ===
+const c4=[
+'Tekrar gidebiliriz.',
+'Denemeye değer bir mekan.',
+'Genel olarak tavsiye ederim.',
+'Güzel bir tercih oldu, tekrarlayabiliriz.',
+'Fırsat buldukça uğrarız.',
+'Moda civarında iyi bir seçenek.',
+'Yeniden gidebileceğimiz bir yer.',
+'Genel memnuniyetimiz olumlu, tavsiye edebilirim.'
+];
+
+// === 3 YILDIZ KAPANIŞ: 6 varyant ===
+const c3=[
+'Bir şans daha verebilirim.',
+'Manzarası için gidilebilir.',
+'Bazı şeyler düzelse çok daha iyi olabilir.',
+'Potansiyeli olan güzel bir mekan.',
+'İyi günümüze denk gelirse tekrar deneriz.',
+'Ortamı güzel, biraz daha özen gösterilse harika olur.'
+];
+
+// === 2 YILDIZ KAPANIŞ: 5 varyant ===
+const c2=[
+'Belki başka bir gün tekrar deneriz.',
+'Gelişime açık bir mekan, umarız düzelir.',
+'Manzarası güzel, umarız hizmet de aynı seviyeye gelir.',
+'İyileşme potansiyeli var, takipteyiz.',
+'Bir dahaki sefere daha iyi olur diye umuyorum.'
+];
+
+// === 1 YILDIZ KAPANIŞ: 5 varyant ===
+const c1=[
+'Belki ileride bir kez daha şans veririz.',
+'Mekanın ruhunu sevdik, umarız deneyim de iyileşir.',
+'Konum ve atmosfer güzel, geri kalanın da düzeleceğini umuyoruz.',
+'Her şeye rağmen güzel bir mekan, gelişimini takip edeceğiz.',
+'Potansiyeli çok yüksek, umarız hak ettiği seviyeye ulaşır.'
+];
+
+// === DETAYLI AÇILIŞ: 10 varyant ===
+const ob5=[
+'Koço, Moda\'nın deniz kenarındaki en özel mekanlarından biri.',
+'Yıllardır İstanbul\'un en sevdiğim balık restoranlarından biri Koço.',
+'Kadıköy\'de yemek yemek isteyenlerin mutlaka denemesi gereken bir adres.',
+'Moda\'nın simge mekanlarından Koço, her ziyarette bizi şaşırtmayı başarıyor.',
+'İstanbul\'un tarihi lezzetlerini arayanlar için Koço kaçırılmaması gereken bir durak.',
+'Koço, İstanbul\'un en köklü balık restoranlarından biri olarak hâlâ formunda.',
+'Kadıköy Moda\'nın vazgeçilmez adresi Koço, bu kez de bizi hayal kırıklığına uğratmadı.',
+'Deniz kenarında otantik bir İstanbul deneyimi isteyenler için Koço birebir.',
+'Moda İskelesi\'nin hemen yanında, tarihi ve lezzeti bir arada sunan Koço.',
+'İstanbul\'un Anadolu yakasında balık yemek isteyenler için ilk adres Koço.'
+];
+
+// === SAMİMİ AÇILIŞ 5★: 12 varyant ===
+const sam5=[
+'Valla ne diyeyim, Koço\'dan çok memnun ayrıldık!',
+'Arkadaşlar, Koço\'ya gidin pişman olmazsınız.',
+'Koço için tek kelime: süper!',
+'Koço\'ya bayıldık, söyleyecek çok şey var ama özetle: harika!',
+'Efsane bir akşamdı, Koço kendini aştı!',
+'Ne yesek beğensek derseniz cevap: Koço.',
+'Bu kadar güzel bir akşam beklemiyorduk, çok teşekkürler Koço!',
+'Koço\'dan memnun ayrılmamak elde değil.',
+'Bir kelimeyle: kusursuz! Koço her zamanki gibi harika.',
+'Koço\'yu özetlemek gerekirse: lezzet, manzara, keyif.',
+'İstanbul\'da balık yiyeceğim diyorsanız Koço\'ya koşun!',
+'Afiyet olsun dedirten bir akşamdı, Koço\'ya selamlar!'
+];
+
+// === SAMİMİ AÇILIŞ 4★: 8 varyant ===
+const sam4=[
+'Koço\'da fena geçmedi.',
+'Güzeldi, keyif aldık diyebilirim.',
+'Koço\'da hoş bir akşam geçirdik.',
+'Beklentimizi büyük ölçüde karşıladı Koço.',
+'İddia edebilirim ki iyi bir akşamdı.',
+'Koço\'da keyifli bir yemek yedik, memnunuz.',
+'Güzel bir tercihti, pişman değiliz.',
+'Koço\'yu beğendik, bir dahaki sefere de gelebiliriz.'
+];
+
+// === SAMİMİ AÇILIŞ 3★ ve altı: 6 varyant ===
+const samL=[
+'Koço\'dan karışık duygularla ayrıldık ama kötü denilemez.',
+'Bazı şeyler güzeldi, bazıları beklentimizin altında kaldı.',
+'Her şey olmasa da ortam ve manzara güzeldi.',
+'Koço\'nun potansiyeli var ama bu sefer tam tutturamadık.',
+'Fena değildi ama daha iyi olabilirdi diye düşünüyorum.',
+'Manzarası ve mekanı güzel, umarız diğer detaylar da iyileşir.'
+];
+
+// === SAMİMİ KAPANIŞ 5★: 10 varyant ===
+const samC5=[
+'Bir daha gelir miyim? Kesinlikle evet!',
+'Tavsiyemdir 👍',
+'Güzel bir deneyimdi, teşekkürler Koço!',
+'Koço\'ya herkesi götürürüm, o kadar memnunuz.',
+'Favori mekanlarımıza eklendi bile!',
+'Tekrar geleceğimize söz verdik birbirimize.',
+'Koço artık vazgeçilmezimiz.',
+'Puanımız 10 üzerinden 10!',
+'Kısaca: gidin, yiyin, sevin.',
+'Koço\'dan sevgilerle, yine geleceğiz!'
+];
+
+// === SAMİMİ KAPANIŞ 4★: 6 varyant ===
+const samC4=[
+'Tekrar gidebiliriz, neden olmasın.',
+'Tavsiye ederim, güzel bir tercih olur.',
+'Genel olarak memnun kaldık, tekrarlanabilir.',
+'Fena değildi, bir dahaki sefere bakarız.',
+'Koço iyi bir seçenekti, not aldık.',
+'Beğendik, fırsat buldukça uğrarız.'
+];
+
+function opener(){
+return rating>=5?pick(o5):rating>=4?pick(o4):rating>=3?pick(o3):rating>=2?pick(o2):pick(o1);
+}
+function closer(){
+return rating>=5?pick(c5):rating>=4?pick(c4):rating>=3?pick(c3):rating>=2?pick(c2):pick(c1);
+}
+
+const res=[];
+
+// KISA
+{let p=[opener()];const sd=selectedTags.map(t=>tm[t]?.s).filter(Boolean);if(sd.length>0){const j=sd.length<=2?sd.join(' ve '):sd.slice(0,-1).join(', ')+' ve '+sd[sd.length-1];p.push(rating>=4?j.charAt(0).toUpperCase()+j.slice(1)+'.':'Olumlu yönleri: '+j+'.');}if(userNote)p.push(userNote);const cl=closer();if(cl)p.push(cl);res.push({label:'Kısa',text:p.join(' ')});}
+
+// DETAYLI
+{let p=[pick(ob5)];p.push(opener());shuffle(selectedTags).map(t=>tm[t]?.d).filter(Boolean).forEach(d=>p.push(d));if(userNote)p.push(userNote);const cl=closer();if(cl)p.push(cl);res.push({label:'Detaylı',text:p.join(' ')});}
+
+// SAMİMİ
+{let p=[];
+if(rating>=5)p.push(pick(sam5));
+else if(rating>=4)p.push(pick(sam4));
+else p.push(pick(samL));
+p.push(opener());
+const sd=selectedTags.map(t=>tm[t]?.s).filter(Boolean);
+if(sd.length>0){const c=sd.length<=2?sd.join(', '):sd.slice(0,-1).join(', ')+' ve '+sd[sd.length-1];p.push('Özellikle '+c+' diyebilirim.');}
+if(userNote)p.push(userNote);
+if(rating>=5)p.push(pick(samC5));
+else if(rating>=4)p.push(pick(samC4));
+else{const cl=closer();if(cl)p.push(cl);}
+res.push({label:'Samimi',text:p.join(' ')});}
+
+return res;
+}
 function showResult(){document.getElementById('loadingState').classList.remove('active');goToStep(4);resultStars.innerHTML='';for(let i=0;i<5;i++){const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 24 24');const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',starPath);p.classList.add(i<rating?'star-filled':'star-empty');s.appendChild(p);resultStars.appendChild(s);}variantTabs.innerHTML='';variants.forEach((v,i)=>{const t=document.createElement('button');t.className='variant-tab'+(i===activeVariant?' active':'');t.textContent=v.label;t.addEventListener('click',()=>{activeVariant=i;document.querySelectorAll('.variant-tab').forEach((x,j)=>x.classList.toggle('active',j===i));reviewText.textContent=variants[i].text;});variantTabs.appendChild(t);});reviewText.textContent=variants[activeVariant].text;}
 copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(variants[activeVariant].text).then(()=>{const o=document.getElementById('toastOverlay');o.classList.add('show');setTimeout(()=>{o.classList.remove('show');},2000);});});
 document.getElementById('retryBtn').addEventListener('click',generateReview);
